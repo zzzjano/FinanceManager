@@ -1,0 +1,11 @@
+{
+  "realm": "finance-manager",
+  "auth-server-url": "http://localhost:8080/",
+  "ssl-required": "none",
+  "resource": "finance-manager-ssr",
+  "credentials": {
+    "secret": "pJBOd3NEw3Yo7brVsJhMnuwwoiKq0VGW"
+  },
+  "confidential-port": 0,
+  "public-client": false
+}

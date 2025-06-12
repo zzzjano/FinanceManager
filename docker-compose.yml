@@ -1,0 +1,214 @@
+services:
+  # Resource Server - CRUD API with OAuth2 authentication
+  resource-server:
+    build:
+      context: ./resource-server
+      dockerfile: Dockerfile
+    container_name: finance-manager-resource-server
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/financemanager
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=finance-manager
+      - KEYCLOAK_CLIENT_ID=resource-server
+      - KEYCLOAK_CLIENT_SECRET=icb2XzCRWFvmTinFcfEvGuc51cAPkpAY
+      - JWKS_URI=http://keycloak:8080/realms/finance-manager/protocol/openid-connect/certs      
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - USER_SERVICE_URL=http://user-service:3002/api
+      - FINANCE_SERVICE_URL=http://finance-service:3003/api
+    volumes:
+      - ./resource-server:/app
+    depends_on:
+      - mongodb
+      - keycloak
+      - user-service
+      - finance-service
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3001/api/health', (res) => { if (res.statusCode >= 200 && res.statusCode < 300) { process.exit(0); } else { process.exit(1); } }).on('error', (err) => { console.error(err); process.exit(1); });\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: finance-manager-user-service
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongodb:27017/financemanager
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=finance-manager
+      - KEYCLOAK_CLIENT_ID=resource-server
+      - KEYCLOAK_CLIENT_SECRET=icb2XzCRWFvmTinFcfEvGuc51cAPkpAY
+      - JWKS_URI=http://keycloak:8080/realms/finance-manager/protocol/openid-connect/certs
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      - ./user-service:/app
+    depends_on:
+      - mongodb
+      - keycloak
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3002/api/health', (res) => { if (res.statusCode >= 200 && res.statusCode < 300) { process.exit(0); } else { process.exit(1); } }).on('error', (err) => { console.error(err); process.exit(1); });\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+  # Finance Service
+  finance-service:
+    build:
+      context: ./finance-service
+      dockerfile: Dockerfile
+    container_name: finance-manager-finance-service
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - MONGODB_URI=mongodb://mongodb:27017/financemanager
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=finance-manager
+      - KEYCLOAK_CLIENT_ID=resource-server
+      - KEYCLOAK_CLIENT_SECRET=icb2XzCRWFvmTinFcfEvGuc51cAPkpAY
+      - JWKS_URI=http://keycloak:8080/realms/finance-manager/protocol/openid-connect/certs
+    volumes:
+      - ./finance-service:/app
+    depends_on:
+      - mongodb
+      - keycloak
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3003/api/health', (res) => { if (res.statusCode >= 200 && res.statusCode < 300) { process.exit(0); } else { process.exit(1); } }).on('error', (err) => { console.error(err); process.exit(1); });\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Client SPA - React application for end users
+  client-spa:
+    build:
+      context: ./client-spa
+      dockerfile: Dockerfile
+    container_name: finance-manager-client-spa
+    ports:
+      - "3000:80"
+    volumes:
+      - ./client-spa:/app
+      - /app/node_modules
+    depends_on:
+      - resource-server
+      - keycloak
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://127.0.0.1:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # MongoDB - Database for the resource server
+  mongodb:
+    image: mongo:6
+    container_name: finance-manager-mongodb
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Keycloak - Authorization Server for OAuth2
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    container_name: finance-manager-keycloak
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_FEATURES=preview
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    command: ["start-dev"]
+    networks:
+      - finance-network
+    restart: unless-stopped
+
+  # PostgreSQL - Database for Keycloak
+  postgres:
+    image: postgres:15
+    container_name: finance-manager-postgres
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - finance-network
+    restart: unless-stopped
+
+  mongodb-backup:
+    image: mongo:6
+    container_name: finance-manager-mongodb-backup
+    volumes:
+      - ./mongodb-backup.sh:/mongodb-backup.sh
+      - mongodb-backups:/backup
+    depends_on:
+      - mongodb
+    entrypoint: ["bash", "-c", "apt-get update && apt-get install -y cron && echo '0 19 * * * root bash /mongodb-backup.sh' > /etc/cron.d/mongodb-backup && chmod 0644 /etc/cron.d/mongodb-backup && crontab /etc/cron.d/mongodb-backup && cron -f"]
+    networks:
+      - finance-network
+
+  postgres-backup:
+    image: postgres:15
+    container_name: finance-manager-postgres-backup
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - ./postgres-backup.sh:/postgres-backup.sh
+      - postgres-backups:/backup
+    depends_on:
+      - postgres
+    entrypoint: ["bash", "-c", "apt-get update && apt-get install -y cron && echo '0 19 * * * root bash /postgres-backup.sh' > /etc/cron.d/postgres-backup && chmod 0644 /etc/cron.d/postgres-backup && crontab /etc/cron.d/postgres-backup && cron -f"]
+    networks:
+      - finance-network
+
+networks:
+  finance-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+  postgres-data:
+  mongodb-backups:
+  postgres-backups:
+  

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finance-manager
+  labels:
+    name: finance-manager
+    app.kubernetes.io/name: finance-manager
+    app.kubernetes.io/instance: finance-manager-stack
+    app.kubernetes.io/part-of: finance-manager-application
+  annotations:
+    com.docker.compose.project: finance-manager

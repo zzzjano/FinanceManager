@@ -1,0 +1,42 @@
+{
+  "status": "success",
+  "data": {
+    "period": "year",
+    "startDate": "2025-01-01T00:00:00.000Z",
+    "endDate": "2025-12-31T23:59:59.999Z",
+    "report": [
+      {
+        "date": {
+          "year": 2025,
+          "month": 5
+        },
+        "dateFormatted": "2025-05",
+        "income": {
+          "total": 200,
+          "count": 1
+        },
+        "expense": {
+          "total": 220,
+          "count": 14
+        },
+        "balance": -20
+      },
+      {
+        "date": {
+          "year": 2025,
+          "month": 6
+        },
+        "dateFormatted": "2025-06",
+        "income": {
+          "total": 0,
+          "count": 0
+        },
+        "expense": {
+          "total": 40,
+          "count": 4
+        },
+        "balance": -40
+      }
+    ]
+  }
+}

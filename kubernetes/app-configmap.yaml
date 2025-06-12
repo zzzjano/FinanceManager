@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  NODE_ENV: "development"
+  MONGODB_URI: "mongodb://mongodb-service:27017/financemanager"
+  KEYCLOAK_AUTH_SERVER_URL: "http://keycloak-service:8080"
+  KEYCLOAK_REALM: "finance-manager"
+  KEYCLOAK_CLIENT_ID: "resource-server"
+  JWKS_URI: "http://keycloak-service:8080/realms/finance-manager/protocol/openid-connect/certs"
+  USER_SERVICE_URL: "http://user-service:3002/api"
+  FINANCE_SERVICE_URL: "http://finance-service:3003/api"

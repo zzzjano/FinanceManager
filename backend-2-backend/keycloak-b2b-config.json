@@ -1,0 +1,9 @@
+{
+  "realm": "finance-manager",
+  "auth-server-url": "http://localhost:8080",
+  "resource-server-api-url": "http://localhost:3001/api",
+  "report-service-client-id": "finance-report-service",
+  "report-service-client-secret": "FGfkoYzZcNwvfJL4pUgN6Jr8oqvHnlqu",
+  "reports-directory": "./reports",
+  "cron-schedule": "0 2 * * *"
+}

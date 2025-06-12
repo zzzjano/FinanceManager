@@ -1,0 +1,58 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: finance-manager
+
+resources:
+  # Namespace (must be first)
+  - namespace.yaml
+  
+  # Docker Volumes PersistentVolumes
+  - docker-volumes-pv.yaml
+  
+  # Secrets and ConfigMaps
+  - postgres-secret.yaml
+  - keycloak-secret.yaml
+  - app-configmap.yaml
+  - keycloak-configmap.yaml
+  
+  # Infrastructure Services
+  - postgres.yaml
+  - mongodb.yaml
+  - keycloak.yaml
+  
+  # Application Services
+  - user-service.yaml
+  - finance-service.yaml
+  - resource-server.yaml
+  - client-spa.yaml
+
+# Common labels for all resources (Docker Desktop stack support)
+labels:
+  - pairs:
+      app.kubernetes.io/name: finance-manager
+      app.kubernetes.io/instance: finance-manager-stack
+      app.kubernetes.io/part-of: finance-manager-application
+      app.kubernetes.io/managed-by: kustomize
+      project: finance-manager
+      environment: development
+
+# Common annotations for Docker Desktop stack support
+commonAnnotations:
+  com.docker.compose.project: finance-manager
+  app.kubernetes.io/version: "1.0.0"
+
+# Namespace for all resources (optional)
+namespace: finance-manager
+
+# Images configuration (useful for updating image tags)
+images:
+  - name: financemanager-user-service
+    newTag: latest
+  - name: financemanager-finance-service
+    newTag: latest
+  - name: financemanager-resource-server
+    newTag: latest
+  - name: financemanager-client-spa
+    newTag: latest

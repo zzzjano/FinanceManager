@@ -1,0 +1,34 @@
+{
+  "name": "user-service",
+  "version": "1.0.0",
+  "description": "User management microservice for Finance Manager",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "test:unit": "jest --testMatch=\"**/tests/unit/**/*.test.js\"",
+    "test:integration": "jest --testMatch=\"**/tests/integration/**/*.test.js\""
+  },
+  "dependencies": {
+    "@sentry/node": "^9.17.0",
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-jwt": "^8.5.1",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.0.0",
+    "jwks-rsa": "^3.2.0",
+    "mongoose": "^7.2.0",
+    "morgan": "^1.10.0",
+    "qs": "^6.11.2",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "mongodb-memory-server": "^8.16.1",
+    "nodemon": "^2.0.22",
+    "supertest": "^6.3.3"
+  }
+}

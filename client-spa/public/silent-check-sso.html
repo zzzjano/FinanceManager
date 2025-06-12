@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Silent SSO Check</title>
+    <script src="http://localhost:8080/js/keycloak.js"></script>
+    <script>
+        window.onload = function() {
+            parent.postMessage(location.href, location.origin);
+        }
+    </script>
+</head>
+<body>
+    <!-- Strona używana do cichego odświeżania sesji Keycloak -->
+</body>
+</html>

@@ -1,0 +1,39 @@
+# Docker Compose file for multi-platform builds
+# Usage: docker-compose -f docker-compose.buildx.yml build
+
+services:
+  resource-server:
+    build:
+      context: ./resource-server
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: finance-manager/resource-server:latest
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: finance-manager/user-service:latest
+    
+  finance-service:
+    build:
+      context: ./finance-service
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: finance-manager/finance-service:latest
+
+  client-spa:
+    build:
+      context: ./client-spa
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: finance-manager/client-spa:latest
