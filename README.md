@@ -20,7 +20,7 @@ System składa się z następujących komponentów:
 
 ### 1. Sklonuj repozytorium
 ```bash
-git clone <repository-url>
+git clone https://github.com/zzzjano/FinanceManager
 cd FinanceManager
 ```
 
