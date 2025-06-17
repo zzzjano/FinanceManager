@@ -1,7 +1,6 @@
-// filepath: c:\Users\milew\Documents\FinanceManager\backend-2-backend\index.js
 const axios = require('axios');
 const cron = require('node-cron');
-const fs = require('fs-extra'); // Używamy fs-extra
+const fs = require('fs-extra');
 const path = require('path');
 const querystring = require('querystring');
 
@@ -79,10 +78,6 @@ async function fetchAllUsers(accessToken) {
     // Assuming the API returns users in response.data.data.users or response.data.users or directly response.data
     if (response.data && response.data.data && Array.isArray(response.data.data.users)) {
         return response.data.data.users;
-    } else if (response.data && Array.isArray(response.data.users)) {
-        return response.data.users;
-    } else if (response.data && Array.isArray(response.data)) {
-        return response.data;
     }
     console.warn('Users data not found in expected structure in API response. Response data:', response.data);
     return [];

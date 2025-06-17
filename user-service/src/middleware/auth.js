@@ -17,12 +17,11 @@ const authMiddleware = jwt({  // Dynamically fetch the public key from the JWKS 
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKS_URI  }),  // Validate only the issuer, disable audience validation
-  audience: false, // Disable audience validation
+    jwksUri: process.env.JWKS_URI  }), 
+  audience: false, 
   issuer: possibleIssuers, // Allow multiple possible issuer URLs
   algorithms: ['RS256']
 }).unless({ 
-  // Paths that don't require authentication
   path: [
     '/api/health',
     '/api/public',

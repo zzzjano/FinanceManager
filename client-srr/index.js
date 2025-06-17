@@ -18,7 +18,7 @@ app.use(express.json());
 // Konfiguracja sesji - wymagane przez keycloak-connect
 const memoryStore = new session.MemoryStore();
 app.use(session({
-  secret: 'twojSilnySekretSesjiSSR123!', // Zmień na silny, unikalny sekret
+  secret: 'sekret123', // Zmień na silny, unikalny sekret
   resave: false,
   saveUninitialized: true,
   store: memoryStore

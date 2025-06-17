@@ -17,9 +17,9 @@ const authMiddleware = jwt({  // Dynamically fetch the public key from the JWKS 
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: process.env.JWKS_URI  }),  // Validate only the issuer, disable audience validation
-  audience: false, // Disable audience validation
-  issuer: possibleIssuers, // Allow multiple possible issuer URLs
+    jwksUri: process.env.JWKS_URI  }), 
+  audience: false, 
+  issuer: possibleIssuers, 
   algorithms: ['RS256']
 }).unless({ 
   // Paths that don't require authentication

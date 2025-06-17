@@ -22,8 +22,10 @@ export const KeycloakProvider = ({ children }) => {
 
   useEffect(() => {
     const keycloakInstance = new Keycloak(keycloakConfig);
+    let refreshInterval;
 
     keycloakInstance.init({
+      checkLoginIframe: false,
       onLoad: 'check-sso',
       silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
       pkceMethod: 'S256',
@@ -48,7 +50,7 @@ export const KeycloakProvider = ({ children }) => {
           });
 
           // Odśwież token przed wygaśnięciem
-          setInterval(() => {
+          refreshInterval = setInterval(() => {
             keycloakInstance
               .updateToken(70)
               .then(refreshed => {
@@ -67,6 +69,11 @@ export const KeycloakProvider = ({ children }) => {
         console.error('Błąd inicjalizacji Keycloak:', error);
         setLoading(false);
       });
+      return () => {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+  };
   }, []);
 
   // Funkcja logowania

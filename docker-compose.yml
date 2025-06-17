@@ -98,7 +98,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-
   # Client SPA - React application for end users
   client-spa:
     build:
@@ -123,6 +122,56 @@ services:
       retries: 3
       start_period: 20s
 
+  # Client SSR - Server-Side Rendered application
+  client-srr:
+    build:
+      context: ./client-srr
+      dockerfile: Dockerfile
+    container_name: finance-manager-client-srr
+    ports:
+      - "3006:3006"
+    environment:
+      - NODE_ENV=development
+      - PORT=3006
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=finance-manager
+      - RESOURCE_SERVER_URL=http://resource-server:3001/api
+    volumes:
+      - ./client-srr:/app
+    depends_on:
+      - resource-server
+      - keycloak
+    networks:
+      - finance-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3006', (res) => { if (res.statusCode >= 200 && res.statusCode < 300) { process.exit(0); } else { process.exit(1); } }).on('error', (err) => { console.error(err); process.exit(1); });\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Backend-to-Backend - Report generation service
+  backend-2-backend:
+    build:
+      context: ./backend-2-backend
+      dockerfile: Dockerfile
+    container_name: finance-manager-backend-2-backend
+    environment:
+      - NODE_ENV=development
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=finance-manager
+      - RESOURCE_SERVER_API_URL=http://resource-server:3001/api
+    volumes:
+      - ./backend-2-backend:/app
+      - backend-reports:/app/reports
+    depends_on:
+      - resource-server
+      - keycloak
+    networks:
+      - finance-network
+    restart: unless-stopped
+
   # MongoDB - Database for the resource server
   mongodb:
     image: mongo:6
@@ -141,7 +190,7 @@ services:
 
   # Keycloak - Authorization Server for OAuth2
   keycloak:
-    image: quay.io/keycloak/keycloak:21.1.1
+    image: quay.io/keycloak/keycloak:latest
     container_name: finance-manager-keycloak
     environment:
       - KEYCLOAK_ADMIN=admin
@@ -211,4 +260,5 @@ volumes:
   postgres-data:
   mongodb-backups:
   postgres-backups:
+  backend-reports:
   

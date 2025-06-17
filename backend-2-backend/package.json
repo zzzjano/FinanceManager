@@ -1,0 +1,19 @@
+{
+  "name": "backend-2-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "fs-extra": "^11.3.0",
+    "node-cron": "^4.1.0",
+    "path": "^0.12.7",
+    "querystring": "^0.2.1"
+  }
+}

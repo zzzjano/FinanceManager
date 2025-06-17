@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const request = require('supertest');
 const axios = require('axios');
-const app = require('../../../src/app'); // Assuming your Express app is exported from app.js
-const User = require('../../../src/models/User');
+const app = require('../src/app'); // Assuming your Express app is exported from app.js
+const User = require('../src/models/User');
 
 // Mock axios and other external dependencies
 jest.mock('axios');
